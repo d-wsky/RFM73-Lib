@@ -46,7 +46,8 @@ SUBDIRS :=
 C_SRCS +=  \
 ../lcd.c \
 ../main.c \
-../RFM73_init.c \
+../RFM73.c \
+../spi.c \
 ../uart.c
 
 
@@ -59,28 +60,32 @@ ASM_SRCS +=
 OBJS +=  \
 lcd.o \
 main.o \
-RFM73_init.o \
+RFM73.o \
+spi.o \
 uart.o
 
 
 OBJS_AS_ARGS +=  \
 lcd.o \
 main.o \
-RFM73_init.o \
+RFM73.o \
+spi.o \
 uart.o
 
 
 C_DEPS +=  \
 lcd.d \
 main.d \
-RFM73_init.d \
+RFM73.d \
+spi.d \
 uart.d
 
 
 C_DEPS_AS_ARGS +=  \
 lcd.d \
 main.d \
-RFM73_init.d \
+RFM73.d \
+spi.d \
 uart.d
 
 
@@ -123,10 +128,16 @@ OUTPUT_FILE_DEP:= ./makedep.mk
 	$(QUOTE)$(AVR_APP_PATH)avr-gcc.exe$(QUOTE) -funsigned-char -funsigned-bitfields -DF_CPU=10000000UL  -O1 -fpack-struct -fshort-enums -g2 -Wall -c -std=gnu99  -mmcu=atmega128   -MD -MP -MF"$(@:main.o=main.d)" -MT"$(@:main.o=main.d)" -o"$@" "$<"
 	@echo Finished building: $<
 
-./RFM73_init.o: .././RFM73_init.c
+./RFM73.o: .././RFM73.c
 	@echo Building file: $<
 	@echo Invoking: AVR/GNU C Compiler
-	$(QUOTE)$(AVR_APP_PATH)avr-gcc.exe$(QUOTE) -funsigned-char -funsigned-bitfields -DF_CPU=10000000UL  -O1 -fpack-struct -fshort-enums -g2 -Wall -c -std=gnu99  -mmcu=atmega128   -MD -MP -MF"$(@:RFM73_init.o=RFM73_init.d)" -MT"$(@:RFM73_init.o=RFM73_init.d)" -o"$@" "$<"
+	$(QUOTE)$(AVR_APP_PATH)avr-gcc.exe$(QUOTE) -funsigned-char -funsigned-bitfields -DF_CPU=10000000UL  -O1 -fpack-struct -fshort-enums -g2 -Wall -c -std=gnu99  -mmcu=atmega128   -MD -MP -MF"$(@:RFM73.o=RFM73.d)" -MT"$(@:RFM73.o=RFM73.d)" -o"$@" "$<"
+	@echo Finished building: $<
+
+./spi.o: .././spi.c
+	@echo Building file: $<
+	@echo Invoking: AVR/GNU C Compiler
+	$(QUOTE)$(AVR_APP_PATH)avr-gcc.exe$(QUOTE) -funsigned-char -funsigned-bitfields -DF_CPU=10000000UL  -O1 -fpack-struct -fshort-enums -g2 -Wall -c -std=gnu99  -mmcu=atmega128   -MD -MP -MF"$(@:spi.o=spi.d)" -MT"$(@:spi.o=spi.d)" -o"$@" "$<"
 	@echo Finished building: $<
 
 ./uart.o: .././uart.c

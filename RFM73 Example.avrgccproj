@@ -110,7 +110,13 @@
     <Compile Include="RFM73.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="RFM73_init.c">
+    <Compile Include="RFM73.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="spi.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="spi.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="uart.c">

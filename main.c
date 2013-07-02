@@ -35,15 +35,10 @@ Data:				2012-11-10
 #include <inttypes.h>
 #include "lcd.h"
 #include "uart.h"
+#include "spi.h"
 
-#define GREEN_LED		   PA0
-#define RED_LED 		   PA1
 #define Sensitive_LED	   PA2
 
-#define GREEN_LED_SET 	   PORTA |= (1 << GREEN_LED)
-#define GREEN_LED_CLR      PORTA &=~(1 << GREEN_LED)
-#define RED_LED_SET        PORTA |= (1 << RED_LED)
-#define RED_LED_CLR        PORTA &=~(1 << RED_LED)
 #define Sensitive_LED_SET  PORTA |= (1 << Sensitive_LED)
 #define Sensitive_LED_CLR  PORTA &=~(1 << Sensitive_LED)
 
@@ -64,65 +59,38 @@ typedef struct
 
 FlagType	                Flag;
 
-void init_mcu(void);
-void init_port(void);
-void timer2_init(void);
-
-void power_on_delay(void);
-void sub_program_1hz(void);
-
-void Send_Packet(uint8_t type,uint8_t* pbuf,uint8_t len);
-void Send_NACK_Packet(void);
-void Receive_Packet(void);
-void SPI_Bank1_Write_Reg(uint8_t reg, uint8_t *pBuf);
-void SPI_Bank1_Read_Reg(uint8_t reg, uint8_t *pBuf);
-void Carrier_Test(uint8_t b_enable); //carrier test
-
-extern void RFM73_Initialize(void);
-extern void SwitchToTxMode(void);
-extern void SwitchToRxMode(void);
-
 const uint8_t tx_buf[17]={0x30,0x31,0x32,0x33,0x34,0x35,0x36,0x37,0x38,0x39,0x3a,0x3b,0x3c,0x3d,0x3e,0x3f,0x78};
-uint8_t rx_buf[MAX_PACKET_LEN];
+uint8_t rx_buf[RFM73_MAX_PACKET_LEN];
 
 extern const uint8_t RX0_Address[];
 extern const unsigned long Bank1_Reg0_13[];
 
-uint8_t test_data;
-
-int main(void)
+/*********************************************************
+Function: init_port();                                         
+                                                            
+Description:                                                
+	initialize port. 
+*********************************************************/
+void init_port(void)
 {
-	unsigned char  i, j, chksum;
-	
-	
-	power_on_delay();  
- 	init_mcu();
-	
-	sei();
-	
-	count_50hz = 0;
-	Flag.reach_1s = 0;
-
-	RFM73_Initialize();
-	while(1)
-	{
-		//sub_program_1hz();
-		Receive_Packet();
-	}
+	RFM73_CSN_DIR |= (1 << RFM73_CSN_PIN);
+	RFM73_CE_DIR  |= (1 << RFM73_CE_PIN);
+	RFM73_IRQ_DIR &=~(1 << RFM73_IRQ_PIN);
+	RFM73_CE_LOW;
+	DDRA |= 7;
 }
 
-#define DD_MOSI           PB2
-#define DD_SCK            PB1
-
-#define SPI_DORD_LSB_TO_MSB   SPCR |= (1 << DORD)
-#define SPI_DORD_MSB_TO_LSB   SPCR &=~(1 << DORD)
-
-void spi_init() {
-	/* Set MOSI and SCK output, all others input */
-	DDRB |= (1<<DD_MOSI)|(1<<DD_SCK);
-	/* Enable SPI, Master, set clock rate fck/16 */
-	SPCR = (1<<SPE)|(1<<MSTR)|(1<<SPR0);
-	SPI_DORD_MSB_TO_LSB;
+/*********************************************************
+Function: timer2_init();                                         
+                                                            
+Description:                                                
+	initialize timer. 
+*********************************************************/
+void timer2_init(void)
+{
+	TCNT1 = 65535-7250;
+	TCCR1B |=  (1 << CS12) | (1 << CS10);
+	TIMSK |= (1 << TOIE1);
 }
 
 /*********************************************************
@@ -141,37 +109,11 @@ void init_mcu(void)
 	uart_init(0, 38400);
 	stdout = &mystdout;
 	lcd_clear();
-	sprintf_P(lcd_buf, PSTR("Hello from RX..."));
+	sprintf_P(lcd_buf, PSTR("Hello from RX...")); // Change to RX
+	printf_P(PSTR("\033[2JHello from RFM73...\n"));
 	lcd_puts(lcd_buf);
 }
 
-
-/*********************************************************
-Function: init_port();                                         
-                                                            
-Description:                                                
-	initialize port. 
-*********************************************************/
-void init_port(void)
-{
-	RFM73_CSN_DIR |= (1 << RFM73_CSN_PIN);
-	RFM73_CE_DIR  |= (1 << RFM73_CE_PIN);
-	RFM73_IRQ_DIR &=~(1 << RFM73_IRQ_PIN);
-	RFM73_CE_LOW;
-	DDRA |= 7;
-}
-/*********************************************************
-Function: timer2_init();                                         
-                                                            
-Description:                                                
-	initialize timer. 
-*********************************************************/
-void timer2_init(void)
-{
-	TCNT1 = 65535-7250;
-	TCCR1B |=  (1 << CS12) | (1 << CS10);
-	TIMSK |= (1 << TOIE1);
-}
 
 /*********************************************************
 Function:  interrupt ISR_timer()                                        
@@ -206,7 +148,7 @@ void sub_program_1hz(void)
 {
 	uint8_t i;
 	uint8_t temp_buf[32];
-	static uint8_t cnt = 0;
+	static uint16_t cnt = 0;
 	char lcd_buf[16];
 
 	if(Flag.reach_1s)
@@ -218,101 +160,93 @@ void sub_program_1hz(void)
 			temp_buf[i]=tx_buf[i];
 		}
 		
-		Send_Packet(W_TX_PAYLOAD_NOACK_CMD,temp_buf,17);
-		sprintf_P(lcd_buf, PSTR("Sent %d times "), cnt++);
+		uint8_t res = rfm73_send_packet(RFM73_TX_WITH_NOACK, temp_buf, 17);
+		sprintf_P(lcd_buf, PSTR("S=%d;"), cnt++);
 		lcd_gotoxy(0, 1);
 		lcd_puts(lcd_buf);
-		SwitchToRxMode();  //switch to Rx mode
-	}		
+		temp_buf[RFM73_MAX_PACKET_LEN-1]=0;
+		printf_P(PSTR("Sent packet %s\nSent %d times\n"), temp_buf, cnt);
+		rfm73_rx_mode();  //switch to Rx mode
+	}	
 }
-/**************************************************
-Function: Send_Packet
-Description:
-	fill FIFO to send a packet
-Parameter:
-	type: WR_TX_PLOAD or  W_TX_PAYLOAD_NOACK_CMD
-	pbuf: a buffer pointer
-	len: packet length
-Return:
-	None
-**************************************************/
-void Send_Packet(uint8_t type,uint8_t* pbuf,uint8_t len)
+
+void repaint(uint8_t pwr, uint8_t gain, uint8_t dr) {
+	char lcd_buf[19];
+	char lcd1[7], lcd2[7], lcd3[7];
+	if (pwr==0)  sprintf_P(lcd1, PSTR("P=-10;"));
+	if (pwr==1)  sprintf_P(lcd1, PSTR("P=-5; "));
+	if (pwr==2)  sprintf_P(lcd1, PSTR("P= 0; "));
+	if (pwr==3)  sprintf_P(lcd1, PSTR("P=+5; "));
+	if (gain==0) sprintf_P(lcd2, PSTR("G=-20;"));
+	if (gain==1) sprintf_P(lcd2, PSTR("G=  0;"));
+	if (dr==0)   sprintf_P(lcd3, PSTR("D= 1"));
+	if (dr==1)   sprintf_P(lcd3, PSTR("D=.3"));
+	if (dr==2)   sprintf_P(lcd3, PSTR("D= 2"));
+	for (uint8_t i=0; i<6; i++) {
+		lcd_buf[i]=lcd1[i];
+		lcd_buf[i+6]=lcd2[i];
+		lcd_buf[i+12]=lcd3[i];
+	}
+	lcd_gotoxy(0, 0);
+	lcd_puts(lcd_buf);
+	rfm73_init(pwr, gain, dr);
+}
+
+int main(void)
 {
-	uint8_t fifo_sta;
+	power_on_delay();  
+ 	init_mcu();
 	
-	SwitchToTxMode();  //switch to tx mode
-
-	fifo_sta=SPI_Read_Reg(FIFO_STATUS);	// read register FIFO_STATUS's value
-	if((fifo_sta&FIFO_STATUS_TX_FULL)==0)//if not full, send data (write buff)
-	{ 
-	  	RED_LED_SET;
-		
-		SPI_Write_Buf(type, pbuf, len); // Writes data to buffer
-		
-		_delay_ms(50);
-		RED_LED_CLR;
-		_delay_ms(50);
-	}	  	 	
-}
-/**************************************************
-Function: Receive_Packet
-Description:
-	read FIFO to read a packet
-Parameter:
-	None
-Return:
-	None
-**************************************************/
-void Receive_Packet(void)
-{
-	uint8_t len,i,sta,fifo_sta,value,chksum,aa;
-	uint8_t rx_buf[MAX_PACKET_LEN];
-	static uint16_t cnt = 0;
-	static uint16_t cnt2 = 0;
+	sei();
+	
+	count_50hz = 0;
+	Flag.reach_1s = 0;
+	uint16_t cnt = 0, cnt2 = 0;
+	uint8_t rx_buf[RFM73_MAX_PACKET_LEN];
 	char lcd_buf[16];
+	uint8_t pwr = RFM73_OUT_PWR_5DBM;
+	uint8_t gain = RFM73_LNA_GAIN_HIGH;
+	uint8_t dr = RFM73_DATA_RATE_2MBPS;
+	uint8_t b = 0;
 
-	sta=SPI_Read_Reg(STATUS);	// read register STATUS's value
-
-	if((STATUS_RX_DR&sta) == 0x40)				// if receive data ready (RX_DR) interrupt
+	repaint(pwr, gain, dr);
+	while(1)
 	{
-		do
-		{
-			len=SPI_Read_Reg(R_RX_PL_WID_CMD);	// read len
-
-			if(len<=MAX_PACKET_LEN)
-			{
-				SPI_Read_Buf(RD_RX_PLOAD,rx_buf,len);// read receive payload from RX_FIFO buffer
-				sprintf_P(lcd_buf, PSTR("Received %d times"), cnt++);
-				lcd_gotoxy(0, 1);
-				lcd_puts(lcd_buf);
-			}
-			else
-			{
-				SPI_Write_Reg(FLUSH_RX,0);//flush Rx
-			}
-
-			fifo_sta=SPI_Read_Reg(FIFO_STATUS);	// read register FIFO_STATUS's value
-							
-		}while((fifo_sta&FIFO_STATUS_RX_EMPTY)==0); //while not empty
-		
-		chksum = 0;
-		for(i=0;i<16;i++)
-		{
-			chksum +=rx_buf[i]; 
-		}
-		if(chksum==rx_buf[16]&&rx_buf[0]==0x30)
-		{
-			GREEN_LED_SET;
-			_delay_ms(50);
-			_delay_ms(50);
-			GREEN_LED_CLR;
-
-			Send_Packet(W_TX_PAYLOAD_NOACK_CMD,rx_buf,17);
-			SwitchToRxMode();//switch to RX mode
-			sprintf_P(lcd_buf, PSTR("Received %d CRC"), cnt2);
+		//sub_program_1hz(); // Comment to use in RX
+		uint8_t res = rfm73_receive_packet(RFM73_TX_WITH_ACK, rx_buf); // 1 to RX, 0 to TX
+		if (res == 2) {
+			sprintf_P(lcd_buf, PSTR("R =%4d;"), cnt++);
 			lcd_gotoxy(0, 1);
 			lcd_puts(lcd_buf);
-		}	
-	}
-	SPI_Write_Reg(WRITE_REG|STATUS,sta);// clear RX_DR or TX_DS or MAX_RT interrupt flag	
+			rx_buf[RFM73_MAX_PACKET_LEN-1] = 0;
+			printf_P(PSTR("Received packet: %s\nTotal packets: %d\n"), rx_buf, cnt);
+		};
+		if (res == 1) {
+			sprintf_P(lcd_buf, PSTR("RC=%4d;"), cnt2++);
+			lcd_gotoxy(0, 1);
+			lcd_puts(lcd_buf);
+			printf_P(PSTR("Received packet: %s with correct CRC\nTotal correct packets: %d\n"), rx_buf, cnt2);
+		}
+		
+		uint8_t a = PINA & 0xE0;
+		
+		if (a == 0x80) {
+			pwr ++;
+			if (pwr == 4) pwr = 0;
+			b = 1;
+			repaint(pwr, gain, dr);
+		}
+		if (a == 0x40) {
+			gain++;
+			if (gain == 2) gain = 0;
+			b = 1;
+			repaint(pwr, gain, dr);
+		}
+		if (a == 0x20) {
+			dr++;
+			if (dr == 3) dr = 0;
+			b = 1;
+			repaint(pwr, gain, dr);
+		}
+	}	
 }

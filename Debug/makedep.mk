@@ -6,7 +6,9 @@ lcd.c
 
 main.c
 
-RFM73_init.c
+RFM73.c
+
+spi.c
 
 uart.c
 
