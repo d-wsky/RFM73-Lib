@@ -646,7 +646,7 @@ void rfm73_write_buf(uint8_t reg, uint8_t *pBuf, uint8_t length) {
 	spi_read(reg);
 	// then write all UINT8 in buffer(*pBuf) 
 	for(byte_ctr=0; byte_ctr<length; byte_ctr++)
-		spi_read(*pBuf++);
+		spi_read(*(pBuf++));
 	// Set CSN high again
 	RFM73_CSN_HIGH;
 }
@@ -771,7 +771,7 @@ void rfm73_init(uint8_t out_pwr, uint8_t lna_gain, uint8_t data_rate) {
 	rfm73_write_buf((RFM73_CMD_W_REGISTER|RFM73_RADR_TX_ADDR),(uint8_t*)(&RX0_Address),5);
 
 	//read Feature Register Payload With ACK ACTIVATE Payload With ACK (REG28,REG29).
-	i = rfm73_read_reg(RFM73_RADR_FEATURE);
+	i = rfm73_read_reg(RFM73_CMD_R_REGISTER | RFM73_RADR_FEATURE);
 	if (i==0) 
 		rfm73_write_reg(RFM73_CMD_ACTIVATE,0x73); // Active
 	// i!=0 showed that chip has been actived.so do not active again.
@@ -831,54 +831,49 @@ Parameter:
 Return:
 	None
 **************************************************/
-uint8_t rfm73_receive_packet(uint8_t type, uint8_t* data_buf)
-{
-	uint8_t len,i,sta,fifo_sta, chksum;
-	static uint16_t cnt = 0;
-	static uint16_t cnt2 = 0;
+uint8_t rfm73_receive_packet(uint8_t type, uint8_t* data_buf, uint8_t* len) {
+	uint8_t sta,fifo_sta;
 	uint8_t result = 0;
 	
 	// read register STATUS's value
-	sta=rfm73_read_reg(RFM73_RADR_STATUS);
+	sta=rfm73_read_reg(RFM73_CMD_R_REGISTER|RFM73_RADR_STATUS);
 	
 	// if receive data ready (RX_DR) interrupt
 	if(sta & ST_RX_DR_bm) {
 		do {
 			// read len
-			len=rfm73_read_reg(RFM73_CMD_R_RX_PL_WID);	
+			*len=rfm73_read_reg(RFM73_CMD_R_RX_PL_WID);	
 
-			if(len<=RFM73_MAX_PACKET_LEN) {
+			if(*len<=RFM73_MAX_PACKET_LEN) {
 				// read receive payload from RX_FIFO buffer
-				rfm73_read_buf(RFM73_CMD_R_RX_PAYLOAD, data_buf, len);
+				rfm73_read_buf(RFM73_CMD_R_RX_PAYLOAD, data_buf, *len);
 				// return "some data received"
-				result = 1;
+				result = 0;
 			}
 			else {
 				//flush Rx
+				*len = 0;
 				rfm73_write_reg(RFM73_CMD_FLUSH_RX,0);
+				// return "data was flushed"
+				result = 1;
 			}
-			
 			// read register FIFO_STATUS's value
-			fifo_sta=rfm73_read_reg(RFM73_RADR_FIFO_STATUS);			
+			fifo_sta=rfm73_read_reg(RFM73_CMD_R_REGISTER | RFM73_RADR_FIFO_STATUS);			
 		} while ((fifo_sta&FS_RX_EMPTY_bm)==0); //while not empty
 		
-		chksum = 0;
-		for(i=0;i<16;i++) {
-			chksum += data_buf[i];
+		GREEN_LED_SET;
+		if (type == RFM73_RX_WITH_ACK) {
+			rfm73_send_packet(RFM73_CMD_W_TX_PAYLOAD_NOACK, data_buf, *len); // Uncomment to use in RX
 		}
-		
-		if(chksum==data_buf[16]&&data_buf[0]==0x30) {
-			GREEN_LED_SET;
-			if (type == RFM73_RX_WITH_ACK) {
-				rfm73_send_packet(RFM73_CMD_W_TX_PAYLOAD_NOACK, data_buf, 17); // Uncomment to use in RX
-			}
-			GREEN_LED_CLR;
-			//switch to RX mode
-			rfm73_rx_mode();
-			// return "everything is ok"
-			result = 0;
-		}
+		GREEN_LED_CLR;
+		//switch to RX mode
+		rfm73_rx_mode();
 	}
+	else {
+		// return "no data received"
+		result = 2;
+	}
+
 	// clear RX_DR or TX_DS or MAX_RT interrupt flag
 	rfm73_write_reg(RFM73_CMD_W_REGISTER|RFM73_RADR_STATUS,sta);
 	
@@ -898,18 +893,25 @@ Return:
 **************************************************/
 uint8_t rfm73_send_packet(uint8_t type, uint8_t* pbuf, uint8_t len) {
 	uint8_t fifo_sta, result = 0;
+	uint8_t stat;
 	
 	//switch to tx mode
 	rfm73_tx_mode();
 	_delay_us(200);
 	// read register FIFO_STATUS's value
-	fifo_sta=rfm73_read_reg(RFM73_RADR_FIFO_STATUS);
+	fifo_sta=rfm73_read_reg(RFM73_CMD_R_REGISTER | RFM73_RADR_FIFO_STATUS);
 	//if not full, send data (write buff)
 	if((fifo_sta&FS_TX_FULL_bm)==0) {
 	  	RED_LED_SET;
 		// Writes data to buffer
 		if (type==RFM73_TX_WITH_ACK) {
 			rfm73_write_buf(RFM73_CMD_W_TX_PAYLOAD, pbuf, len);
+			// wait for MAX_RT or TX_DS flags
+			do {
+				stat = rfm73_read_reg(RFM73_CMD_R_REGISTER | RFM73_RADR_STATUS);
+			} while (!(stat & (ST_MAX_RT_bm | ST_TX_DS_bm)));
+			// error "no reply"
+			if (stat & ST_MAX_RT_bm) result = 1;
 		}		
 		else {
 			rfm73_write_buf(RFM73_CMD_W_TX_PAYLOAD_NOACK, pbuf, len);
@@ -917,5 +919,24 @@ uint8_t rfm73_send_packet(uint8_t type, uint8_t* pbuf, uint8_t len) {
 		RED_LED_CLR;
 	}
 	
+	return result;
+}
+
+uint8_t rfm73_observe(uint8_t* packet_lost, uint8_t* retrans_count) {
+	uint8_t res = rfm73_read_reg(RFM73_CMD_R_REGISTER | RFM73_RADR_OBSERVE_TX);
+	// return packet lost count
+	*packet_lost = (res & 0xF0) >> 4;
+	// return retransmit count
+	*retrans_count = (res & 0x0F);
 	return 0;
+}
+
+uint8_t rfm73_carrier_detect() {
+	volatile uint8_t res = rfm73_read_reg(RFM73_CMD_R_REGISTER | RFM73_RADR_CD);
+	return (res & 1);
+}
+
+uint8_t rfm73_get_channel() {
+	uint8_t res = rfm73_read_reg(RFM73_CMD_R_REGISTER | RFM73_RADR_RF_CH);
+	return (res & 0x7F);
 }

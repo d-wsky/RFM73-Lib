@@ -65,7 +65,11 @@ void rfm73_rx_mode(void);
 void rfm73_init(uint8_t out_pwr, uint8_t lna_gain, uint8_t data_rate);
 void rfm73_set_channel(uint8_t _cfg);
 
-uint8_t rfm73_receive_packet(uint8_t type, uint8_t* data_buf);
+uint8_t rfm73_receive_packet(uint8_t type, uint8_t* data_buf, uint8_t* len);
 uint8_t rfm73_send_packet(uint8_t type, uint8_t* pbuf, uint8_t len);
+
+uint8_t rfm73_observe(uint8_t* packet_lost, uint8_t* retrans_count);
+uint8_t rfm73_carrier_detect();
+uint8_t rfm73_get_channel();
 
 #endif
