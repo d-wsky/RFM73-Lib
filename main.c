@@ -9,15 +9,13 @@
 #include "uart.h"
 #include "spi.h"
 
-#define Sensitive_LED	   PA2
+#define CS_LED	   PA2
 
-#define Sensitive_LED_SET  PORTA |= (1 << Sensitive_LED)
-#define Sensitive_LED_CLR  PORTA &=~(1 << Sensitive_LED)
+#define CS_LED_SET  PORTA |= (1 << CS_LED)
+#define CS_LED_CLR  PORTA &=~(1 << CS_LED)
 
 
 unsigned char t1 = 0;
-
-#define TX_DEVICE
 
 static FILE mystdout = FDEV_SETUP_STREAM(uart_putchar, NULL,
                                             _FDEV_SETUP_WRITE);
@@ -84,7 +82,7 @@ Description:
 *********************************************************/
 ISR(TIMER1_OVF_vect) {
     t1 = 1;
-	PORTA ^= 4;
+	//PORTA ^= 4;
 	TCNT1 = 65535-7250;
 }
 
@@ -127,7 +125,7 @@ void sub_program_1hz(void)
 		uint8_t pl=0, rc=0;
 		rfm73_observe(&pl, &rc);
 		uint8_t ch=rfm73_get_channel();
-		sprintf_P(lcd_buf, PSTR("R=%3d;R=%2d;C=%d "), cnt_good, pl, ch);
+		sprintf_P(lcd_buf, PSTR("R=%3d;L=%2d;C=%d "), cnt_good, pl, ch);
 		lcd_gotoxy(0, 1);
 		lcd_puts(lcd_buf);
 		temp_buf[RFM73_MAX_PACKET_LEN-1]=0;
@@ -155,7 +153,7 @@ void repaint(uint8_t pwr, uint8_t gain, uint8_t dr) {
 	}
 	lcd_gotoxy(0, 0);
 	lcd_puts(lcd_buf);
-	rfm73_init(pwr, gain, dr);
+	rfm73_set_rf_params(pwr, gain, dr);
 }
 
 int main(void)
@@ -166,25 +164,38 @@ int main(void)
 	sei();
 	
 	uint16_t cnt = 0, cnt2 = 0;
+	static char lcd_buf[20];
 	uint8_t rx_buf[RFM73_MAX_PACKET_LEN];
 	uint8_t pwr = RFM73_OUT_PWR_5DBM;
 	uint8_t gain = RFM73_LNA_GAIN_HIGH;
-	uint8_t dr = RFM73_DATA_RATE_1MBPS;
+	uint8_t dr = RFM73_DATA_RATE_2MBPS;
 	uint8_t pl = 0, rc = 0, cs = 0, len = 0;
-	uint8_t ch = 0x17;
+	uint8_t ch = 0;
 	uint8_t b = 0;
 
+	rfm73_init(pwr, gain, dr);
+	#ifdef TX_DEVICE
+		sprintf_P(lcd_buf, PSTR("Finding receiver"));
+		lcd_gotoxy(0, 1);
+		lcd_puts(lcd_buf);
+		// auto-find first receiver
+		RFM73_CE_HIGH;
+		rfm73_find_receiver(&ch, &dr);
+	#endif
 	repaint(pwr, gain, dr);
 	while(1)
 	{
 		RFM73_CE_HIGH;
+		// sensing the carrier
+		_delay_us(400);
+		uint8_t cd = rfm73_carrier_detect();
+		if (cd) CS_LED_SET;
+		else    CS_LED_CLR;
 	#ifdef TX_DEVICE
 		sub_program_1hz(); // comment to use in RX
-		uint8_t res = rfm73_receive_packet(RFM73_RX_WITH_NOACK, rx_buf, &len); // 1 to RX, 0 to TX
 		RFM73_CE_LOW;
 	#endif
 	#ifdef RX_DEVICE
-		static char lcd_buf[20];
 		_delay_ms(50);
 		uint8_t res = rfm73_receive_packet(RFM73_RX_WITH_ACK, rx_buf, &len); // 1 to RX, 0 to TX
 		RFM73_CE_LOW;

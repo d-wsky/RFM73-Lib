@@ -49,20 +49,30 @@
 
 #define RFM73_MAX_PACKET_LEN       32// max value is 32
 
+#define RFM73_ADR_WID_3BYTES       0b01
+#define RFM73_ADR_WID_4BYTES       0b10
+#define RFM73_ADR_WID_5BYTES       0b11
+
 /* Transmit address */
 uint8_t rfm73_tx_addr[5];
 
 
-uint8_t rfm73_read_reg(uint8_t reg);
-void rfm73_read_buf(uint8_t reg, uint8_t *pBuf, uint8_t bytes);
+uint8_t _rfm73_read_reg(uint8_t reg);
+void _rfm73_read_buf(uint8_t reg, uint8_t *pBuf, uint8_t bytes);
 
-void rfm73_write_reg(uint8_t reg, uint8_t value);
-void rfm73_write_buf(uint8_t reg, uint8_t *pBuf, uint8_t length);
+void _rfm73_write_reg(uint8_t reg, uint8_t value);
+void _rfm73_write_buf(uint8_t reg, uint8_t *pBuf, uint8_t length);
 
 void rfm73_tx_mode(void);
 void rfm73_rx_mode(void);
+void rfm73_power_up();
+void rfm73_power_down();
 
 void rfm73_init(uint8_t out_pwr, uint8_t lna_gain, uint8_t data_rate);
+void rfm73_set_rf_params(uint8_t out_pwr, uint8_t lna_gain, uint8_t data_rate);
+void rfm73_mask_int(uint8_t mask_rx_dr, uint8_t mask_tx_ds, uint8_t mask_max_rt);
+void rfm73_set_address_width(uint8_t aw);
+void rfm73_set_autort(uint16_t rt_time, uint8_t rt_count);
 void rfm73_set_channel(uint8_t _cfg);
 
 uint8_t rfm73_receive_packet(uint8_t type, uint8_t* data_buf, uint8_t* len);
@@ -71,5 +81,6 @@ uint8_t rfm73_send_packet(uint8_t type, uint8_t* pbuf, uint8_t len);
 uint8_t rfm73_observe(uint8_t* packet_lost, uint8_t* retrans_count);
 uint8_t rfm73_carrier_detect();
 uint8_t rfm73_get_channel();
+uint8_t rfm73_find_receiver(uint8_t* ch, uint8_t* dr);
 
 #endif

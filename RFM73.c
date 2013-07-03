@@ -24,35 +24,35 @@
 	1: PRX
 	0: PTX*/
 #define CF_PRIM_RX_bf           (0)
-#define CF_PRIM_RX_bm           (1 << CF_PRIM_RX_bf)
+#define CF_PRIM_RX_bm           (0x01)
 /*!< \brief Power control.
 	1: POWER UP
 	0:POWER  DOWN*/
 #define CF_PWR_UP_bf            (1)
-#define CF_PWR_UP_bm            (1 << CF_PWR_UP_bf)
+#define CF_PWR_UP_bm            (0x02)
 /*!< \brief CRC encoding scheme.
 	0 - 1 byte 
 	1 - 2 bytes*/
 #define CF_CRCO_bf              (2)
-#define CF_CRCO_bm              (1 << CF_CRCO_bf)
+#define CF_CRCO_bm              (0x04)
 /*!< \brief Enable CRC. Forced high if one of the bits in the EN_AA is high*/
 #define CF_EN_CRC_bf            (3)
-#define CF_EN_CRC_bm            (1 << CF_EN_CRC_bf)
+#define CF_EN_CRC_bm            (0x08)
 /*!< \brief Mask interrupt caused by MAX_RT.
 	1: Interrupt not reflected on the IRQ pin 
 	0: Reflect MAX_RT as active low interrupt on the IRQ pin*/
 #define CF_MASK_MAX_RT_bf       (4)
-#define CF_MASK_MAX_RT_bm       (1 << CF_MASK_MAX_RT_bf)
+#define CF_MASK_MAX_RT_bm       (0x10)
 /*!< \brief Mask interrupt caused by TX_DS.
 	1: Interrupt not reflected on the IRQ pin 
 	0: Reflect TX_DS as active low interrupt on the IRQ pin */
 #define CF_MASK_TX_DS_bf        (5)
-#define CF_MASK_TX_DS_bm        (1 << CF_MASK_TX_DS_bf)
+#define CF_MASK_TX_DS_bm        (0x20)
 /*!< \brief Mask interrupt caused by RX_DR.
 	1: Interrupt not reflected on the IRQ pin 
 	0: Reflect RX_DR as active low interrupt on the IRQ pin */
 #define CF_MASK_RX_DR_bf        (6)
-#define CF_MASK_RX_DR_bm        (1 << CF_MASK_RX_DR_bf)
+#define CF_MASK_RX_DR_bm        (0x40)
 /*****************************************************************************/
 
 /*****************************************************************************/
@@ -157,14 +157,14 @@ below 5 bytes:
 	0: Low gain(20dB down)
 	1: High gain.*/
 #define RS_LNA_HCURR_bf         (0)
-#define RS_LNA_HCURR_bm         (1 << RS_LNA_HCURR_bf)
+#define RS_LNA_HCURR_bm         (0x01)
 /*!< \brief Set RF output power in TX mode.
 	00: -10 dBm
 	01: -5 dBm
     10: 0 dBm
 	11: 5 dBm */
 #define RS_RF_PWR_bf            (1)
-#define RS_RF_PWR_bm            (1 << RS_RF_PWR_bf)
+#define RS_RF_PWR_bm            (0x06)
 /*!< \brief Set Air Data Rate. Encoding:
 	RF_DR_HIGH, RF_DR_LOW:
 	00: 1Mbps
@@ -172,13 +172,14 @@ below 5 bytes:
 	10: 2Mbps (default)
 	11: 2Mbps */
 #define RS_RF_DR_HIGH_bf        (3)
-#define RS_RF_DR_HIGH_bm        (1 << RS_RF_DR_HIGH_bf)
+#define RS_RF_DR_HIGH_bm        (0x08)
 /*!< \brief Force PLL lock signal. Only used in test (default is 0).*/
 #define RS_PLL_LOCK_bf          (4)
-#define RS_PLL_LOCK_bm          (1 << RS_PLL_LOCK_bf)
+#define RS_PLL_LOCK_bm          (0x10)
 /*!< \brief Set Air Data Rate. See RF_DR_HIGH for encoding */
 #define RS_RF_DR_LOW_bf         (5)
-#define RS_RF_DR_LOW_bm         (1 << RS_RF_DR_LOW_bf)
+#define RS_RF_DR_LOW_bm         (0x20)
+#define RS_RF_DR_bm             (0x28)
 /*****************************************************************************/
 
 /*****************************************************************************/
@@ -190,33 +191,33 @@ on the MISO pin) */
 	1: TX FIFO full 
 	0: Available locations in TX FIFO*/
 #define ST_TX_FULL_bf           (0)
-#define ST_TX_FULL_bm           (1 << ST_TX_FULL_bf)
+#define ST_TX_FULL_bm           (0x01)
 /*!< \brief Data pipe number for the payload available for reading from
 RX_FIFO:
 	000-101: Data Pipe Number 
 	110: Not used 
 	111: RX FIFO Empty*/
 #define ST_RX_P_NO_bf           (1)
-#define ST_RX_P_NO_bm           (1 << ST_RX_P_NO_bf)
+#define ST_RX_P_NO_bm           (0x0E)
 /*!< \brief  Maximum number of TX retransmits interrupt. Write 1 to clear bit.
 If MAX_RT is asserted it must be cleared to enable further communication.*/
 #define ST_MAX_RT_bf            (4)
-#define ST_MAX_RT_bm            (1 << ST_MAX_RT_bf)
+#define ST_MAX_RT_bm            (0x10)
 /*!< \brief   Data Sent TX FIFO interrupt. Asserted when packet transmitted on
 TX. If AUTO_ACK is activated, this bit is set high only when ACK is received.
 Write 1 to clear bit.*/
 #define ST_TX_DS_bf             (5)
-#define ST_TX_DS_bm             (1 << ST_TX_DS_bf)
+#define ST_TX_DS_bm             (0x20)
 /*!< \brief   Data Ready RX FIFO interrupt. Asserted when new data arrives RX
 FIFO. Write 1 to clear bit.*/
 #define ST_RX_DR_bf             (6)
-#define ST_RX_DR_bm             (1 << ST_RX_DR_bf)
+#define ST_RX_DR_bm             (0x40)
  /*!< \brief   Register bank selection states. Switch register bank is done by
 SPI command "ACTIVATE"  followed by 0x53
 	0: Register bank 0
 	1: Register bank 1*/
 #define ST_RBANK_bf             (7)
-#define ST_RBANK_bm             (1 << ST_RBANK_bf)
+#define ST_RBANK_bm             (0x80)
 /*****************************************************************************/
 
 /*****************************************************************************/
@@ -566,19 +567,13 @@ const uint8_t RX0_Address[]={0x34,0x43,0x10,0x10,0x01};
 //Receive address data pipe 1
 const uint8_t RX1_Address[]={0x39,0x38,0x37,0x36,0xc2};
 
-//extern uint8_t test_data;
-//extern uint8_t channel;
-//extern uint8_t power;
-//extern uint8_t data_rate;
-//extern uint8_t rx_buf[RFM73_MAX_PACKET_LEN];
-
 /**************************************************         
-Function: rfm73_write_reg();                                  
+Function: _rfm73_write_reg();                                  
                                                             
 Description:                                                
 	Writes value 'value' to register 'reg'              
 **************************************************/        
-void rfm73_write_reg(uint8_t reg, uint8_t value) {
+void _rfm73_write_reg(uint8_t reg, uint8_t value) {
 	// CSN low, init SPI transaction
 	RFM73_CSN_LOW;
 	// select register
@@ -591,12 +586,12 @@ void rfm73_write_reg(uint8_t reg, uint8_t value) {
 /**************************************************/        
                                                             
 /**************************************************         
-Function: rfm73_read_reg();                                   
+Function: _rfm73_read_reg();                                   
                                                             
 Description:                                                
 	Read one UINT8 from BK2421 register, 'reg'           
 **************************************************/        
-uint8_t rfm73_read_reg(uint8_t reg) {        
+uint8_t _rfm73_read_reg(uint8_t reg) {        
 	uint8_t value;
 	// CSN low, initialize SPI communication...
 	RFM73_CSN_LOW;
@@ -611,12 +606,12 @@ uint8_t rfm73_read_reg(uint8_t reg) {
 }
                                                             
 /**************************************************         
-Function: rfm73_read_buf();                                   
+Function: _rfm73_read_buf();                                   
                                                             
 Description:                                                
 	Reads 'length' #of length from register 'reg'         
 **************************************************/        
-void rfm73_read_buf(uint8_t reg, uint8_t *pBuf, uint8_t length) {                                
+void _rfm73_read_buf(uint8_t reg, uint8_t *pBuf, uint8_t length) {                                
 	uint8_t status,byte_ctr;
 	// Set CSN low
 	RFM73_CSN_LOW;
@@ -632,12 +627,12 @@ void rfm73_read_buf(uint8_t reg, uint8_t *pBuf, uint8_t length) {
 }
                                                             
 /**************************************************         
-Function: rfm73_write_buf();                                  
+Function: _rfm73_write_buf();                                  
                                                             
 Description:                                                
 	Writes contents of buffer '*pBuf' to RFM73         
 **************************************************/        
-void rfm73_write_buf(uint8_t reg, uint8_t *pBuf, uint8_t length) {
+void _rfm73_write_buf(uint8_t reg, uint8_t *pBuf, uint8_t length) {
 	uint8_t byte_ctr;
 	
 	// Set CSN low, init SPI tranaction
@@ -660,19 +655,19 @@ void rfm73_rx_mode()
 {
 	uint8_t value;
 	//flush Rx
-	rfm73_write_reg(RFM73_CMD_FLUSH_RX,0);
+	_rfm73_write_reg(RFM73_CMD_FLUSH_RX,0);
 	// read register STATUS's value
-	value=rfm73_read_reg(RFM73_RADR_STATUS);
+	value=_rfm73_read_reg(RFM73_RADR_STATUS);
 	// clear RX_DR or TX_DS or MAX_RT interrupt flag
-	rfm73_write_reg(RFM73_CMD_W_REGISTER|RFM73_RADR_STATUS,value);
+	_rfm73_write_reg(RFM73_CMD_W_REGISTER|RFM73_RADR_STATUS,value);
 
 	RFM73_CE_LOW;
 	// read register CONFIG's value
-	value=rfm73_read_reg(RFM73_RADR_CONFIG);
+	value=_rfm73_read_reg(RFM73_RADR_CONFIG);
 	//PRX set bit 1
 	value=value|0x01;
 	// Set PWR_UP bit, enable CRC(2 length) & Prim:RX. RX_DR enabled..
-  	rfm73_write_reg(RFM73_CMD_W_REGISTER | RFM73_RADR_CONFIG, value); 
+  	_rfm73_write_reg(RFM73_CMD_W_REGISTER | RFM73_RADR_CONFIG, value); 
 
 	RFM73_CE_HIGH;
 }
@@ -686,21 +681,21 @@ void rfm73_tx_mode()
 {
 	uint8_t value;
 	//flush Tx
-	rfm73_write_reg(RFM73_CMD_FLUSH_TX,0);
+	_rfm73_write_reg(RFM73_CMD_FLUSH_TX,0);
 
 	RFM73_CE_LOW;
 	// read register CONFIG's value
-	value=rfm73_read_reg(RFM73_RADR_CONFIG);	
+	value=_rfm73_read_reg(RFM73_RADR_CONFIG);	
     //PTX set bit 0
 	value=value&0xfe;
 	// Set PWR_UP bit, enable CRC(2 length) & Prim:RX. RX_DR enabled.
-  	rfm73_write_reg(RFM73_CMD_W_REGISTER|RFM73_RADR_CONFIG, value); 
+  	_rfm73_write_reg(RFM73_CMD_W_REGISTER|RFM73_RADR_CONFIG, value); 
 	
 	RFM73_CE_HIGH;
 }
 
 /**************************************************
-Function: rfm73_toggle_reg_bank();
+Function: _rfm73_toggle_reg_bank();
                                                             
 Description:
 	 access switch between Bank1 and Bank0 
@@ -711,16 +706,32 @@ Parameter:
 Return:
      None
 **************************************************/
-void rfm73_toggle_reg_bank(uint8_t rbank) {
+void _rfm73_toggle_reg_bank(uint8_t rbank) {
 	uint8_t temp;
 
-	temp=rfm73_read_reg(7);
+	temp=_rfm73_read_reg(7);
 	temp=temp&0x80;
 
 	if( ( (temp)&&(rbank==0) )
 	||( ((temp)==0)&&(rbank) ) ) {
-		rfm73_write_reg(RFM73_CMD_ACTIVATE,0x53);
+		_rfm73_write_reg(RFM73_CMD_ACTIVATE,0x53);
 	}
+}
+
+void rfm73_power_up() {
+	uint8_t conf = _rfm73_read_reg(RFM73_CMD_R_REGISTER | RFM73_RADR_CONFIG);
+	// set CF_PWR_UP bit high
+	conf |= CF_PWR_UP_bm;
+	_rfm73_write_reg(RFM73_CMD_W_REGISTER | RFM73_RADR_CONFIG, conf);
+	// power up delay
+	_delay_ms(3);
+}
+
+void rfm73_power_down() {
+	uint8_t conf = _rfm73_read_reg(RFM73_CMD_R_REGISTER | RFM73_RADR_CONFIG);
+	// set CF_PWR_UP bit low
+	conf &=~CF_PWR_UP_bm;
+	_rfm73_write_reg(RFM73_CMD_W_REGISTER | RFM73_RADR_CONFIG, conf);
 }
 
 /**************************************************
@@ -731,78 +742,163 @@ Description:
 **************************************************/
 void rfm73_set_channel(uint8_t ch)
 {
-	rfm73_write_reg((uint8_t)(RFM73_CMD_W_REGISTER|RFM73_RADR_RF_CH),
+	_rfm73_write_reg((uint8_t)(RFM73_CMD_W_REGISTER|RFM73_RADR_RF_CH),
 	                (uint8_t)(ch));
 }
 
-/**************************************************         
-Function: rfm73_init();                                  
+void rfm73_set_rf_params(uint8_t out_pwr, uint8_t lna_gain, uint8_t data_rate) {
+	volatile uint8_t c;
+	// read config
+	c = _rfm73_read_reg(RFM73_CMD_R_REGISTER | RFM73_RADR_RF_SETUP);
+	// clear all used bits
+	c &=~(RS_RF_DR_bm | RS_LNA_HCURR_bm | RS_RF_PWR_bm);
+	// set appropriate bits
+	c |= (out_pwr & 3) << RS_RF_PWR_bf;
+	c |= (lna_gain & 1) << RS_LNA_HCURR_bf;
+    c |= (((data_rate & 2) >> 1) << RS_RF_DR_HIGH_bf) |
+	     ((data_rate & 1) << RS_RF_DR_LOW_bf);
+	// write config
+	_rfm73_write_reg(RFM73_CMD_W_REGISTER | RFM73_RADR_RF_SETUP, c);	
+}
 
-Description:                                                
-	register initialization
-**************************************************/   
+void rfm73_set_address_width(uint8_t aw) {
+	uint8_t c = aw & 3;
+	// '00' is illegal
+	if (c==0) c = 1;
+	_rfm73_write_reg(RFM73_CMD_W_REGISTER|RFM73_RADR_SETUP_AW, c);
+}
+
+void rfm73_set_autort(uint16_t rt_time, uint8_t rt_count) {
+	uint8_t time = rt_time/250-1;
+	uint8_t count = rt_count;
+	// set up constrains
+	if (rt_time<250) time = 0;
+	if (rt_time>4000) time = 15;
+	if (rt_count>15) count = 15;
+	_rfm73_write_reg(RFM73_CMD_W_REGISTER | RFM73_RADR_SETUP_RETR, (time << 4) | count);
+}
+
+void rfm73_mask_int(uint8_t mask_rx_dr, uint8_t mask_tx_ds, uint8_t mask_max_rt) {
+	// read current state
+	uint8_t c = _rfm73_read_reg(RFM73_CMD_R_REGISTER | RFM73_RADR_CONFIG);
+	// clear mask bits
+	c &=~(CF_MASK_MAX_RT_bm | CF_MASK_RX_DR_bm | CF_MASK_TX_DS_bm);
+	// set appropriate mask bits
+	c |= (((mask_rx_dr & 1) << CF_MASK_RX_DR_bf) |
+	      ((mask_tx_ds & 1) << CF_MASK_TX_DS_bf) |
+		  ((mask_max_rt& 1) << CF_MASK_MAX_RT_bf));
+	// write new config
+	_rfm73_write_reg(RFM73_CMD_W_REGISTER | RFM73_RADR_CONFIG, c);
+}
+
+void rfm73_set_tx_addr(uint8_t* addr) {
+	// get address lenght
+	uint8_t addr_len = 
+	    _rfm73_read_reg(RFM73_CMD_R_REGISTER | RFM73_RADR_SETUP_AW);
+	// set new addr
+	_rfm73_write_buf((RFM73_CMD_W_REGISTER | RFM73_RADR_TX_ADDR),
+	                 addr, addr_len+2);
+}
+
+void rfm73_set_rx_addr_p0(uint8_t* addr) {
+	// get address lenght
+	uint8_t addr_len = 
+	    _rfm73_read_reg(RFM73_CMD_R_REGISTER | RFM73_RADR_SETUP_AW);
+	// set new addr
+	_rfm73_write_buf((RFM73_CMD_W_REGISTER | RFM73_RADR_RX_ADDR_P0),
+	                 addr, addr_len+2);
+}
+
+void rfm73_set_rx_addr_p1(uint8_t* addr) {
+	// get address lenght
+	uint8_t addr_len = 
+	    _rfm73_read_reg(RFM73_CMD_R_REGISTER | RFM73_RADR_SETUP_AW);
+	// set new addr
+	_rfm73_write_buf((RFM73_CMD_W_REGISTER | RFM73_RADR_RX_ADDR_P1),
+	                 addr, addr_len+2);
+}
+
+void rfm73_set_rx_addr_p2(uint8_t addr) {
+	_rfm73_write_reg((RFM73_CMD_W_REGISTER | RFM73_RADR_RX_ADDR_P2), addr);
+}
+
+void rfm73_set_rx_addr_p3(uint8_t addr) {
+	_rfm73_write_reg((RFM73_CMD_W_REGISTER | RFM73_RADR_RX_ADDR_P3), addr);
+}
+
+void rfm73_set_rx_addr_p4(uint8_t addr) {
+	_rfm73_write_reg((RFM73_CMD_W_REGISTER | RFM73_RADR_RX_ADDR_P4), addr);
+}
+
+void rfm73_set_rx_addr_p5(uint8_t addr) {
+	_rfm73_write_reg((RFM73_CMD_W_REGISTER | RFM73_RADR_RX_ADDR_P5), addr);
+}
+
+/*! \brief This function is used to init RFM73 module and to set all parameters
+to some values.*/
 void rfm73_init(uint8_t out_pwr, uint8_t lna_gain, uint8_t data_rate) {
 	uint8_t i,j;
  	uint8_t WriteArr[12];
 
 	_delay_ms(200);
 	
-	rfm73_toggle_reg_bank(0);
+	_rfm73_toggle_reg_bank(0);
 
-	// set output power
-	
-	Bank0_Reg[RFM73_RADR_RF_SETUP][1] = 0;
-	Bank0_Reg[RFM73_RADR_RF_SETUP][1] |= (out_pwr & 3) << RS_RF_PWR_bf;
-	Bank0_Reg[RFM73_RADR_RF_SETUP][1] |= (lna_gain & 1) << RS_LNA_HCURR_bf;
-	Bank0_Reg[RFM73_RADR_RF_SETUP][1] |= ((data_rate & 2) << RS_RF_DR_HIGH_bf) |
-	                                     ((data_rate & 1) << RS_RF_DR_LOW_bf);
-										 
+	// set output power										 
 	for(i=0;i<20;i++) {
-		rfm73_write_reg((RFM73_CMD_W_REGISTER|Bank0_Reg[i][0]),Bank0_Reg[i][1]);
+		_rfm73_write_reg((RFM73_CMD_W_REGISTER|Bank0_Reg[i][0]),Bank0_Reg[i][1]);
 	}
 	
+	rfm73_set_rf_params(out_pwr, lna_gain, data_rate);
+	rfm73_set_address_width(RFM73_ADR_WID_5BYTES);
+	rfm73_set_autort(4000, 15);
+	rfm73_mask_int(0, 0, 1);
+	
 	//reg 10 - Rx0 addr
-	rfm73_write_buf((RFM73_CMD_W_REGISTER|RFM73_RADR_RX_ADDR_P0),(uint8_t*)(&RX0_Address),5);
+	//_rfm73_write_buf((RFM73_CMD_W_REGISTER|RFM73_RADR_RX_ADDR_P0),(uint8_t*)(&RX0_Address),5);
+	rfm73_set_rx_addr_p0((uint8_t*)(&RX0_Address));
 	
 	//REG 11 - Rx1 addr
-	rfm73_write_buf((RFM73_CMD_W_REGISTER|RFM73_RADR_RX_ADDR_P1),(uint8_t*)(&RX1_Address),5);
+	//_rfm73_write_buf((RFM73_CMD_W_REGISTER|RFM73_RADR_RX_ADDR_P1),(uint8_t*)(&RX1_Address),5);
+	rfm73_set_rx_addr_p1((uint8_t*)(&RX1_Address));
 
 	//REG 16 - TX addr
-	rfm73_write_buf((RFM73_CMD_W_REGISTER|RFM73_RADR_TX_ADDR),(uint8_t*)(&RX0_Address),5);
+	//_rfm73_write_buf((RFM73_CMD_W_REGISTER|RFM73_RADR_TX_ADDR),(uint8_t*)(&RX0_Address),5);
+	rfm73_set_tx_addr((uint8_t*)(&RX0_Address));
 
 	//read Feature Register Payload With ACK ACTIVATE Payload With ACK (REG28,REG29).
-	i = rfm73_read_reg(RFM73_CMD_R_REGISTER | RFM73_RADR_FEATURE);
+	i = _rfm73_read_reg(RFM73_CMD_R_REGISTER | RFM73_RADR_FEATURE);
 	if (i==0) 
-		rfm73_write_reg(RFM73_CMD_ACTIVATE,0x73); // Active
+		_rfm73_write_reg(RFM73_CMD_ACTIVATE,0x73); // Active
 	// i!=0 showed that chip has been actived.so do not active again.
 	
 	for(i=22;i>=21;i--) {
-		rfm73_write_reg((RFM73_CMD_W_REGISTER|Bank0_Reg[i][0]),Bank0_Reg[i][1]);
+		_rfm73_write_reg((RFM73_CMD_W_REGISTER|Bank0_Reg[i][0]),Bank0_Reg[i][1]);
 	}
 	
 	// write bank1 registers
-	rfm73_toggle_reg_bank(1);
+	_rfm73_toggle_reg_bank(1);
 	
 	// reversed order of bytes
 	for(i=0;i<=8;i++){
 		for(j=0;j<4;j++)
 			WriteArr[j]=(Bank1_Reg0_13[i]>>(8*(j) ) )&0xff;
 
-		rfm73_write_buf((RFM73_CMD_W_REGISTER|i),&(WriteArr[0]),4);
+		_rfm73_write_buf((RFM73_CMD_W_REGISTER|i),&(WriteArr[0]),4);
 	}
 
 	for(i=9;i<=13;i++) {
 		for(j=0;j<4;j++)
 			WriteArr[j]=(Bank1_Reg0_13[i]>>(8*(3-j) ) )&0xff;
 
-		rfm73_write_buf((RFM73_CMD_W_REGISTER|i),&(WriteArr[0]),4);
+		_rfm73_write_buf((RFM73_CMD_W_REGISTER|i),&(WriteArr[0]),4);
 	}
 
-	//rfm73_write_buf((RFM73_CMD_W_REGISTER|14),&(Bank1_Reg14[0]),11);
+	//_rfm73_write_buf((RFM73_CMD_W_REGISTER|14),&(Bank1_Reg14[0]),11);
 	for(j=0;j<11;j++) {
 		WriteArr[j]=Bank1_Reg14[j];
 	}
-	rfm73_write_buf((RFM73_CMD_W_REGISTER|14),&(WriteArr[0]),11);
+	_rfm73_write_buf((RFM73_CMD_W_REGISTER|14),&(WriteArr[0]),11);
 
 	//toggle REG4<25,26>
 	for(j=0;j<4;j++)
@@ -810,55 +906,61 @@ void rfm73_init(uint8_t out_pwr, uint8_t lna_gain, uint8_t data_rate) {
 		WriteArr[j]=(Bank1_Reg0_13[4]>>(8*(j) ) )&0xff;
 
 	WriteArr[0]=WriteArr[0]|0x06;
-	rfm73_write_buf((RFM73_CMD_W_REGISTER|4),&(WriteArr[0]),4);
+	_rfm73_write_buf((RFM73_CMD_W_REGISTER|4),&(WriteArr[0]),4);
 
 	WriteArr[0]=WriteArr[0]&0xf9;
-	rfm73_write_buf((RFM73_CMD_W_REGISTER|4),&(WriteArr[0]),4);
+	_rfm73_write_buf((RFM73_CMD_W_REGISTER|4),&(WriteArr[0]),4);
 
 	_delay_ms(50);
 	
-	rfm73_toggle_reg_bank(0);
+	_rfm73_toggle_reg_bank(0);
 	rfm73_rx_mode();
 }
 
 
-/**************************************************
-Function: Receive_Packet
-Description:
-	read FIFO to read a packet
-Parameter:
-	None
-Return:
-	None
-**************************************************/
+/*! \brief This function is used to get new packet from FIFO buffer.
+
+\param type - #RFM73_RX_WITH_ACK if explicit acknowledge of the packet is
+              needed;
+			  #RFM73_RX_WITH_NOACK to only get data from FIFO buffer.
+\param data_buf - pointer to start of the input buffer;
+\param len  - length of received packet (this data is read from RFM73,
+              and does not exceed 32).
+			  
+\return 0 - if received data is correct;
+        1 - if #RFM73_MAX_PACKET_LEN is exceeded, input FIFO buffer is flushed,
+		    data_buf unchanged;
+	    2 - if flag RX_DR (receive data ready) doesn't raised.
+		
+\warning Possible hangouts in certain conditions.*/
 uint8_t rfm73_receive_packet(uint8_t type, uint8_t* data_buf, uint8_t* len) {
 	uint8_t sta,fifo_sta;
 	uint8_t result = 0;
 	
 	// read register STATUS's value
-	sta=rfm73_read_reg(RFM73_CMD_R_REGISTER|RFM73_RADR_STATUS);
+	sta=_rfm73_read_reg(RFM73_CMD_R_REGISTER|RFM73_RADR_STATUS);
 	
 	// if receive data ready (RX_DR) interrupt
 	if(sta & ST_RX_DR_bm) {
 		do {
 			// read len
-			*len=rfm73_read_reg(RFM73_CMD_R_RX_PL_WID);	
+			*len=_rfm73_read_reg(RFM73_CMD_R_RX_PL_WID);	
 
 			if(*len<=RFM73_MAX_PACKET_LEN) {
 				// read receive payload from RX_FIFO buffer
-				rfm73_read_buf(RFM73_CMD_R_RX_PAYLOAD, data_buf, *len);
+				_rfm73_read_buf(RFM73_CMD_R_RX_PAYLOAD, data_buf, *len);
 				// return "some data received"
 				result = 0;
 			}
 			else {
 				//flush Rx
 				*len = 0;
-				rfm73_write_reg(RFM73_CMD_FLUSH_RX,0);
+				_rfm73_write_reg(RFM73_CMD_FLUSH_RX,0);
 				// return "data was flushed"
 				result = 1;
 			}
 			// read register FIFO_STATUS's value
-			fifo_sta=rfm73_read_reg(RFM73_CMD_R_REGISTER | RFM73_RADR_FIFO_STATUS);			
+			fifo_sta=_rfm73_read_reg(RFM73_CMD_R_REGISTER | RFM73_RADR_FIFO_STATUS);			
 		} while ((fifo_sta&FS_RX_EMPTY_bm)==0); //while not empty
 		
 		GREEN_LED_SET;
@@ -875,22 +977,27 @@ uint8_t rfm73_receive_packet(uint8_t type, uint8_t* data_buf, uint8_t* len) {
 	}
 
 	// clear RX_DR or TX_DS or MAX_RT interrupt flag
-	rfm73_write_reg(RFM73_CMD_W_REGISTER|RFM73_RADR_STATUS,sta);
+	_rfm73_write_reg(RFM73_CMD_W_REGISTER|RFM73_RADR_STATUS,sta);
 	
 	return result;
 }
 
-/**************************************************
-Function: rfm73_send_packet
-Description:
-	fill FIFO to send a packet
-Parameter:
-	type: WR_TX_PLOAD or  W_TX_PAYLOAD_NOACK_CMD
-	pbuf: a buffer pointer
-	len: packet length
-Return:
-	None
-**************************************************/
+/*! \brief This function fill up transmit buffer and sends data.
+
+Data is sent only if FIFO buffer is empty.
+
+\param type - #RFM73_TX_WITH_ACK send package with auto-acknowledge, guarantee
+              delivery status;
+              #RFM73_TX_WITH_NOACK - send package without autoacknowledge,
+			  delivery status is unknown;
+\param pbuf - pointer to RAM-buffer to be sent;
+\param len  - length of data to be sent. Mustn't exceed 32 (FIFO buffer length)
+
+\return 0 - data sent successfully (acknowledge received if enabled);
+        1 - no reply from receiver (delivery probably failed).
+
+\warning Potential hang if acknowledge is used. It happens when RFM73 in
+"power down" mode.*/
 uint8_t rfm73_send_packet(uint8_t type, uint8_t* pbuf, uint8_t len) {
 	uint8_t fifo_sta, result = 0;
 	uint8_t stat;
@@ -899,22 +1006,22 @@ uint8_t rfm73_send_packet(uint8_t type, uint8_t* pbuf, uint8_t len) {
 	rfm73_tx_mode();
 	_delay_us(200);
 	// read register FIFO_STATUS's value
-	fifo_sta=rfm73_read_reg(RFM73_CMD_R_REGISTER | RFM73_RADR_FIFO_STATUS);
+	fifo_sta=_rfm73_read_reg(RFM73_CMD_R_REGISTER | RFM73_RADR_FIFO_STATUS);
 	//if not full, send data (write buff)
 	if((fifo_sta&FS_TX_FULL_bm)==0) {
 	  	RED_LED_SET;
 		// Writes data to buffer
 		if (type==RFM73_TX_WITH_ACK) {
-			rfm73_write_buf(RFM73_CMD_W_TX_PAYLOAD, pbuf, len);
+			_rfm73_write_buf(RFM73_CMD_W_TX_PAYLOAD, pbuf, len);
 			// wait for MAX_RT or TX_DS flags
 			do {
-				stat = rfm73_read_reg(RFM73_CMD_R_REGISTER | RFM73_RADR_STATUS);
+				stat = _rfm73_read_reg(RFM73_CMD_R_REGISTER | RFM73_RADR_STATUS);
 			} while (!(stat & (ST_MAX_RT_bm | ST_TX_DS_bm)));
 			// error "no reply"
 			if (stat & ST_MAX_RT_bm) result = 1;
 		}		
 		else {
-			rfm73_write_buf(RFM73_CMD_W_TX_PAYLOAD_NOACK, pbuf, len);
+			_rfm73_write_buf(RFM73_CMD_W_TX_PAYLOAD_NOACK, pbuf, len);
 		}		
 		RED_LED_CLR;
 	}
@@ -922,8 +1029,18 @@ uint8_t rfm73_send_packet(uint8_t type, uint8_t* pbuf, uint8_t len) {
 	return result;
 }
 
+/*! \brief This function returns some parameters used to observe quality of channel.
+
+\param packet_lost   - number of packets lost from switching to current channel. The
+                       counter is overflow protected to 15, and discontinues at max
+					   until reset. The counter is reset by changing channel. For some
+					   unknown reason this counter counts only to 1.
+\param retrans_count - number of times last packet was retransmitted. The counter is
+                       reset when transmission of a new packet starts.
+
+\return 0.*/
 uint8_t rfm73_observe(uint8_t* packet_lost, uint8_t* retrans_count) {
-	uint8_t res = rfm73_read_reg(RFM73_CMD_R_REGISTER | RFM73_RADR_OBSERVE_TX);
+	uint8_t res = _rfm73_read_reg(RFM73_CMD_R_REGISTER | RFM73_RADR_OBSERVE_TX);
 	// return packet lost count
 	*packet_lost = (res & 0xF0) >> 4;
 	// return retransmit count
@@ -931,12 +1048,57 @@ uint8_t rfm73_observe(uint8_t* packet_lost, uint8_t* retrans_count) {
 	return 0;
 }
 
+/*! \brief This function returns "carrier detect" status bit.
+
+\return 1 if rf carrier is detected;
+        0 if no rf carrier is detected.
+		
+\warning This bit is not reliable enough.*/
 uint8_t rfm73_carrier_detect() {
-	volatile uint8_t res = rfm73_read_reg(RFM73_CMD_R_REGISTER | RFM73_RADR_CD);
+	volatile uint8_t res = _rfm73_read_reg(RFM73_CMD_R_REGISTER | RFM73_RADR_CD);
 	return (res & 1);
 }
 
+/*! \brief This function returns current rf channel of the module.
+
+\return 0-127 - channel number.*/
 uint8_t rfm73_get_channel() {
-	uint8_t res = rfm73_read_reg(RFM73_CMD_R_REGISTER | RFM73_RADR_RF_CH);
+	uint8_t res = _rfm73_read_reg(RFM73_CMD_R_REGISTER | RFM73_RADR_RF_CH);
 	return (res & 0x7F);
+}
+
+/*! \brief This function scans air with auto-acknowledge message and returns
+channel and datarate of the first answer.
+
+\param ch - starting channel of the scan; in this variable channel number would be
+            returned in case of answer;
+\param dr - in this variable would be returned datarate;
+
+\return 1 (and change #ch and #dr variables) if acknowledge received;
+        0 if nothing received.*/
+uint8_t rfm73_find_receiver(uint8_t* ch, uint8_t* dr) {
+	uint8_t pl = 0xAA;
+	uint8_t res;
+	volatile uint8_t cur_ch = *ch;
+	volatile uint8_t cur_dr = *dr;
+	rfm73_set_autort(4000, 15);
+	// scan every channel
+	for (; cur_ch<0x80; cur_ch++) {
+		rfm73_set_channel(cur_ch);
+		// scan every data-rate
+		for (cur_dr=0; cur_dr<3; cur_dr++) {
+			rfm73_set_rf_params(RFM73_OUT_PWR_5DBM, RFM73_LNA_GAIN_HIGH, cur_dr);
+			// clear RX_DR, TX_DS, MAX_RT
+			uint8_t stat = _rfm73_read_reg(RFM73_CMD_R_REGISTER|RFM73_RADR_STATUS);
+			_rfm73_write_reg(RFM73_CMD_W_REGISTER|RFM73_RADR_STATUS, stat);
+			res = rfm73_send_packet(RFM73_TX_WITH_ACK, (uint8_t*)(&pl), 1);
+			// if autoack received twice then break
+			if (!res) {
+				*ch = cur_ch;
+				*dr = cur_dr;
+				return 1;
+			}
+		}		
+	}
+	return 0;
 }

@@ -75,6 +75,7 @@
   <avrgcc.compiler.symbols.DefSymbols>
     <ListValues>
       <Value>F_CPU=14835100UL</Value>
+      <Value>TX_DEVICE</Value>
     </ListValues>
   </avrgcc.compiler.symbols.DefSymbols>
   <avrgcc.compiler.optimization.level>Optimize (-O1)</avrgcc.compiler.optimization.level>
