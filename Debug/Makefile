@@ -119,38 +119,38 @@ OUTPUT_FILE_DEP:= ./makedep.mk
 ./lcd.o: .././lcd.c
 	@echo Building file: $<
 	@echo Invoking: AVR/GNU C Compiler
-	$(QUOTE)$(AVR_APP_PATH)avr-gcc.exe$(QUOTE) -funsigned-char -funsigned-bitfields -DF_CPU=14835100UL -DTX_DEVICE  -O1 -fpack-struct -fshort-enums -g2 -Wall -c -std=gnu99  -mmcu=atmega128   -MD -MP -MF"$(@:lcd.o=lcd.d)" -MT"$(@:lcd.o=lcd.d)" -o"$@" "$<"
+	$(QUOTE)$(AVR_APP_PATH)avr-gcc.exe$(QUOTE) -funsigned-char -funsigned-bitfields -DF_CPU=10000000UL -DRX_DEVICE  -O1 -fpack-struct -fshort-enums -g2 -Wall -c -std=gnu99  -mmcu=atmega128   -MD -MP -MF"$(@:lcd.o=lcd.d)" -MT"$(@:lcd.o=lcd.d)" -o"$@" "$<"
 	@echo Finished building: $<
 
 ./main.o: .././main.c
 	@echo Building file: $<
 	@echo Invoking: AVR/GNU C Compiler
-	$(QUOTE)$(AVR_APP_PATH)avr-gcc.exe$(QUOTE) -funsigned-char -funsigned-bitfields -DF_CPU=14835100UL -DTX_DEVICE  -O1 -fpack-struct -fshort-enums -g2 -Wall -c -std=gnu99  -mmcu=atmega128   -MD -MP -MF"$(@:main.o=main.d)" -MT"$(@:main.o=main.d)" -o"$@" "$<"
+	$(QUOTE)$(AVR_APP_PATH)avr-gcc.exe$(QUOTE) -funsigned-char -funsigned-bitfields -DF_CPU=10000000UL -DRX_DEVICE  -O1 -fpack-struct -fshort-enums -g2 -Wall -c -std=gnu99  -mmcu=atmega128   -MD -MP -MF"$(@:main.o=main.d)" -MT"$(@:main.o=main.d)" -o"$@" "$<"
 	@echo Finished building: $<
 
 ./RFM73.o: .././RFM73.c
 	@echo Building file: $<
 	@echo Invoking: AVR/GNU C Compiler
-	$(QUOTE)$(AVR_APP_PATH)avr-gcc.exe$(QUOTE) -funsigned-char -funsigned-bitfields -DF_CPU=14835100UL -DTX_DEVICE  -O1 -fpack-struct -fshort-enums -g2 -Wall -c -std=gnu99  -mmcu=atmega128   -MD -MP -MF"$(@:RFM73.o=RFM73.d)" -MT"$(@:RFM73.o=RFM73.d)" -o"$@" "$<"
+	$(QUOTE)$(AVR_APP_PATH)avr-gcc.exe$(QUOTE) -funsigned-char -funsigned-bitfields -DF_CPU=10000000UL -DRX_DEVICE  -O1 -fpack-struct -fshort-enums -g2 -Wall -c -std=gnu99  -mmcu=atmega128   -MD -MP -MF"$(@:RFM73.o=RFM73.d)" -MT"$(@:RFM73.o=RFM73.d)" -o"$@" "$<"
 	@echo Finished building: $<
 
 ./spi.o: .././spi.c
 	@echo Building file: $<
 	@echo Invoking: AVR/GNU C Compiler
-	$(QUOTE)$(AVR_APP_PATH)avr-gcc.exe$(QUOTE) -funsigned-char -funsigned-bitfields -DF_CPU=14835100UL -DTX_DEVICE  -O1 -fpack-struct -fshort-enums -g2 -Wall -c -std=gnu99  -mmcu=atmega128   -MD -MP -MF"$(@:spi.o=spi.d)" -MT"$(@:spi.o=spi.d)" -o"$@" "$<"
+	$(QUOTE)$(AVR_APP_PATH)avr-gcc.exe$(QUOTE) -funsigned-char -funsigned-bitfields -DF_CPU=10000000UL -DRX_DEVICE  -O1 -fpack-struct -fshort-enums -g2 -Wall -c -std=gnu99  -mmcu=atmega128   -MD -MP -MF"$(@:spi.o=spi.d)" -MT"$(@:spi.o=spi.d)" -o"$@" "$<"
 	@echo Finished building: $<
 
 ./uart.o: .././uart.c
 	@echo Building file: $<
 	@echo Invoking: AVR/GNU C Compiler
-	$(QUOTE)$(AVR_APP_PATH)avr-gcc.exe$(QUOTE) -funsigned-char -funsigned-bitfields -DF_CPU=14835100UL -DTX_DEVICE  -O1 -fpack-struct -fshort-enums -g2 -Wall -c -std=gnu99  -mmcu=atmega128   -MD -MP -MF"$(@:uart.o=uart.d)" -MT"$(@:uart.o=uart.d)" -o"$@" "$<"
+	$(QUOTE)$(AVR_APP_PATH)avr-gcc.exe$(QUOTE) -funsigned-char -funsigned-bitfields -DF_CPU=10000000UL -DRX_DEVICE  -O1 -fpack-struct -fshort-enums -g2 -Wall -c -std=gnu99  -mmcu=atmega128   -MD -MP -MF"$(@:uart.o=uart.d)" -MT"$(@:uart.o=uart.d)" -o"$@" "$<"
 	@echo Finished building: $<
 
 
 ./%.o: .././%.c
 	@echo Building file: $<
 	@echo Invoking: AVR/GNU C Compiler
-	$(QUOTE)$(AVR_APP_PATH)avr-gcc.exe$(QUOTE) -funsigned-char -funsigned-bitfields -DF_CPU=14835100UL -DTX_DEVICE  -O1 -fpack-struct -fshort-enums -g2 -Wall -c -std=gnu99  -mmcu=atmega128   -MD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o"$@" "$<"
+	$(QUOTE)$(AVR_APP_PATH)avr-gcc.exe$(QUOTE) -funsigned-char -funsigned-bitfields -DF_CPU=10000000UL -DRX_DEVICE  -O1 -fpack-struct -fshort-enums -g2 -Wall -c -std=gnu99  -mmcu=atmega128   -MD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o"$@" "$<"
 	@echo Finished building: $<
 
 

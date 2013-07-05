@@ -135,25 +135,52 @@ void sub_program_1hz(void)
 }
 
 void repaint(uint8_t pwr, uint8_t gain, uint8_t dr) {
+	rfm73_set_rf_params(pwr, gain, dr);
 	char lcd_buf[19];
-	char lcd1[7], lcd2[7], lcd3[7];
-	if (pwr==0)  sprintf_P(lcd1, PSTR("P=-10;"));
-	if (pwr==1)  sprintf_P(lcd1, PSTR("P=-5; "));
-	if (pwr==2)  sprintf_P(lcd1, PSTR("P= 0; "));
-	if (pwr==3)  sprintf_P(lcd1, PSTR("P=+5; "));
-	if (gain==0) sprintf_P(lcd2, PSTR("G=-20;"));
-	if (gain==1) sprintf_P(lcd2, PSTR("G=  0;"));
-	if (dr==0)   sprintf_P(lcd3, PSTR("D= 1"));
-	if (dr==1)   sprintf_P(lcd3, PSTR("D=.3"));
-	if (dr==2)   sprintf_P(lcd3, PSTR("D= 2"));
-	for (uint8_t i=0; i<6; i++) {
-		lcd_buf[i]=lcd1[i];
-		lcd_buf[i+6]=lcd2[i];
-		lcd_buf[i+12]=lcd3[i];
+	switch (pwr) {
+		case 0: 
+			sprintf_P(lcd_buf, PSTR("P=-10;"));
+			printf_P(PSTR("Out power is -10dBm; "));
+			break;
+		case 1:
+			sprintf_P(lcd_buf, PSTR("P=-5; "));
+			printf_P(PSTR("Out power is -5 dBm; "));
+			break;
+		case 2:
+			sprintf_P(lcd_buf, PSTR("P= 0; "));
+			printf_P(PSTR("Out power is 0 dBm; "));
+			break;
+		case 3:
+			sprintf_P(lcd_buf, PSTR("P=+5; "));
+			printf_P(PSTR("Out power is +5 dBm; "));
+			break;
 	}
+	switch (gain) {
+		case 0:
+			sprintf_P(lcd_buf+6, PSTR("G=-20;"));
+			printf_P(PSTR("LNA gain is -20 dBm; "));
+			break;
+		case 1:
+			sprintf_P(lcd_buf+6, PSTR("G=  0;"));;
+			printf_P(PSTR("LNA gain is 0 dBm; "));
+			break;
+	}
+	switch (dr) {
+		case 0:
+			sprintf_P(lcd_buf+12, PSTR("D= 1"));
+			printf_P(PSTR("Datarate is 1 Mbps\n"));
+			break;
+		case 1:
+			sprintf_P(lcd_buf+12, PSTR("D=.3"));
+			printf_P(PSTR("Datarate is 0.25 Mbps\n"));
+			break;
+		case 2:
+			sprintf_P(lcd_buf+12, PSTR("D= 2"));
+			printf_P(PSTR("Datarate is 2 Mbps"));
+			break;
+	}	
 	lcd_gotoxy(0, 0);
 	lcd_puts(lcd_buf);
-	rfm73_set_rf_params(pwr, gain, dr);
 }
 
 int main(void)
@@ -166,14 +193,14 @@ int main(void)
 	uint16_t cnt = 0, cnt2 = 0;
 	static char lcd_buf[20];
 	uint8_t rx_buf[RFM73_MAX_PACKET_LEN];
-	uint8_t pwr = RFM73_OUT_PWR_5DBM;
+	uint8_t pwr = RFM73_OUT_PWR_PLUS5DBM;
 	uint8_t gain = RFM73_LNA_GAIN_HIGH;
 	uint8_t dr = RFM73_DATA_RATE_2MBPS;
 	uint8_t pl = 0, rc = 0, cs = 0, len = 0;
 	uint8_t ch = 0;
 	uint8_t b = 0;
 
-	rfm73_init(pwr, gain, dr);
+	rfm73_init(pwr, gain, dr, 0x23);
 	#ifdef TX_DEVICE
 		sprintf_P(lcd_buf, PSTR("Finding receiver"));
 		lcd_gotoxy(0, 1);
@@ -207,7 +234,7 @@ int main(void)
 			lcd_gotoxy(0, 1);
 			lcd_puts(lcd_buf);
 			rx_buf[len] = 0;
-			printf_P(PSTR("Received packet: %s\nTotal packets: %d\n"), rx_buf, cnt);
+			printf_P(PSTR("Received packet: %s\nTotal packets: %d\nCurrent channel: %d\n"), rx_buf, cnt, ch);
 			if (cnt==999) cnt = 0;
 		};
 		// input fifo was flushed
@@ -253,12 +280,14 @@ int main(void)
 			ch--;
 			if (ch==0xFF) ch=0x7F;
 			rfm73_set_channel(ch);
+			printf_P(PSTR("Set channel %d\n"), ch);
 			b = 1;
 		}
 		if ((a == 0x08) && (b==0)) {
 			ch++;
 			if (ch>0x7F) ch=0;
 			rfm73_set_channel(ch);
+			printf_P(PSTR("Set channel %d\n"), ch);
 			b = 1;
 		}
 		if (a==0) b=0;
